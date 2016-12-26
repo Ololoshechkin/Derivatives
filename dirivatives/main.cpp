@@ -267,8 +267,8 @@ bool psp(string &ans) {
 }
 
 int main(int argc, const char * argv[]) {
-    //freopen("deriv.in", "r", stdin);
-    //freopen("deriv.out", "w", stdout);
+    freopen("deriv.in", "r", stdin);
+    freopen("deriv.out", "w", stdout);
     bool making_readable_enabled = 0;
     while (1) {
         getline(cin, s);
