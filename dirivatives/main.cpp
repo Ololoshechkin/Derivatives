@@ -11,6 +11,8 @@
 #include <math.h>
 #include <algorithm>
 #include <string>
+#include <cstdio>
+#include <cstdlib>
 // #include <bits/stdc++.h>
 using namespace std;
 #define function kekesmen
