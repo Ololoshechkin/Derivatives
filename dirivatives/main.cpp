@@ -23,9 +23,16 @@ string substring(int l, int r) {
     return s.substr(l, r - l + 1);
 }
 
-bool isNumber(string &str, int l, int r) {
+bool isIntegerNumber(string &str, int l, int r) {
     for (int i = l; i <= r; ++i)
         if (str[i] < '0' || str[i] > '9')
+            return 0;
+    return 1;
+}
+
+bool isDoubleNumber(string &str, int l, int r) {
+    for (int i = l; i <= r; ++i)
+        if ((str[i] < '0' || str[i] > '9') &&  s[i] != '.')
             return 0;
     return 1;
 }
@@ -45,8 +52,11 @@ string dirivative_multiplyement(int l, int r) {
         if (s[i] == '(') {++bal;continue;}
         if (s[i] == ')') {--bal;continue;}
         if (!bal && s[i] == '^') {
-            if (substring(l, i - 1) == "x" && isNumber(s, i + 1, r)) {
+            if (substring(l, i - 1) == "x" && isIntegerNumber(s, i + 1, r)) {
                 return substring(i + 1, r) + "*x^" + to_string(stoi(substring(i + 1, r)) - 1);
+            }
+            if (substring(l, i - 1) == "x" && isDoubleNumber(s, i + 1, r)) {
+                return substring(i + 1, r) + "*x^(" + to_string(stof(substring(i + 1, r)) - 1) + ")";
             }
             int l0 = (int)s.size();
             s += substring(i + 1, r) + "*ln(" + substring(l, i - 1) + ")";
@@ -146,129 +156,9 @@ string dirivative_expr(int l, int r) {
     return ans;
 }
 
-char get(string &ans, int i) {
-    if (i < 0) return '!';
-    if (i >= (int) ans.size()) return '?';
-    return ans[i];
-}
-
-void delete_x1(string &ans) {
-    // "*1
-    // 1*?
-    // ?*1*?
-    string answer = "";
-    for (int i = 0; i < (int) ans.size(); ++i) {
-        
-        if (get(ans, i) == '*' && get(ans, i + 1) == '1' && (get(ans, i + 2) < '0' || get(ans, i + 2) > '9')) {
-            ++i;
-            continue;
-        }
-        if (get(ans, i) == '1' && get(ans, i + 1) == '*' && (get(ans, i - 1) < '0' || get(ans, i - 1) > '9')) {
-            ++i;
-            continue;
-        }
-        
-        if (get(ans, i) == '+' && get(ans, i + 1) == '0' && get(ans, i + 2) == '+') {
-            i += 2;
-            continue;
-        }
-        if (get(ans, i) == '0' && get(ans, i + 1) == '+' && (get(ans, i - 1) < '0' || get(ans, i - 1) > '9')) {
-            ++i;
-            continue;
-        }
-        if (get(ans, i) == '+' && get(ans, i + 1) == '0') {
-            ++i;
-            continue;
-        }
-        
-        answer.push_back(ans[i]);
-    }
-    ans = answer;
-}
-
-bool is_simple_expression(string ans, int l, int r) {
-    string cur = ans.substr(l, r - l + 1);
-    if (isNumber(cur, 0, r - l)) return 1;
-    if (cur == "x") return 1;
-    if (cur == "sin(x)" || cur == "sinx") return 1;
-    if (cur == "cos(x)" || cur == "cosx") return 1;
-    if (cur == "tg(x)" || cur == "tgx") return 1;
-    if (cur == "ctg(x)" || cur == "ctgx") return 1;
-    if (cur == "arcsin(x)" || cur == "arcsinx") return 1;
-    if (cur == "arccos(x)" || cur == "arccosx") return 1;
-    if (cur == "arctg(x)" || cur == "arctgx") return 1;
-    if (cur == "arcctg(x)" || cur == "arcctgx") return 1;
-    if (cur == "ln(x)" || cur == "lnx") return 1;
-    return 0;
-}
-
-void delete_brackets(string &ans) {
-    vector<int> right_pair((int) ans.size());
-    vector<int> st;
-    for (int i = 0; i < (int) ans.size(); ++i) {
-        if (ans[i] == '(') st.push_back(i);
-        else if (ans[i] == ')') {
-            right_pair[st.back()] = i;
-            st.pop_back();
-        }
-    }
-    vector<bool> deleted((int) ans.size());
-    for (int i = 0; i < (int) ans.size() - 1; ++i) {
-        if (ans[i] == '(' && ans[i + 1] == '(' && right_pair[i] - 1 == right_pair[i + 1]) {
-            deleted[i] = deleted[right_pair[i]] = 1;
-        }
-    }
-    int func_bal = 0;
-    for (int i = 0; i < (int) ans.size(); ++i) {
-        if (ans.substr(i, 4) == "cos(") i = right_pair[i + 3];
-        if (ans.substr(i, 4) == "ctg(") i = right_pair[i + 3];
-        if (ans.substr(i, 4) == "sin(") i = right_pair[i + 3];
-        if (ans.substr(i, 3) == "tg(") i = right_pair[i + 2];
-        if (ans.substr(i, 3) == "ln(") i = right_pair[i + 2];
-        if (ans.substr(i, 7) == "arcsin(") i = right_pair[i + 6];
-        if (ans.substr(i, 7) == "arccos(") i = right_pair[i + 6];
-        if (ans.substr(i, 7) == "arcctg(") i = right_pair[i + 6];
-        if (ans.substr(i, 6) == "arctg(") i = right_pair[i + 5];
-        if (ans[i] == '(' && is_simple_expression(ans, i + 1, right_pair[i] - 1)) {
-            deleted[i] = deleted[right_pair[i]] = 1;
-        }
-    }
-    bool should_delete_external = (ans[0] == '(');
-    int bal = 0;
-    for (int i = 0; i < (int) ans.size() - 1; ++i) {
-        if (ans[i] == '(') ++bal;
-        if (ans[i] == ')') --bal;
-        if (!bal) should_delete_external = 0;
-    }
-    if (should_delete_external) deleted[0] = deleted[right_pair[0]] = 1;
-    string answer = "";
-    for (int i = 0; i < (int) ans.size(); ++i)
-        if (!deleted[i])
-            answer.push_back(ans[i]);
-    ans = answer;
-}
-
-void make_readable(string &ans) {
-    for (int i = 0; i < 30; ++i) {
-        delete_brackets(ans);
-        delete_x1(ans);
-    }
-}
-
-bool psp(string &ans) {
-    int bal = 0;
-    for (int i = 0; i < (int)ans.size(); ++i) {
-        if (ans[i] == '(') ++bal;
-        if (ans[i] == ')') --bal;
-        if (bal < 0) return 0;
-    }
-    if (bal) return 0;
-    return 1;
-}
-
 int main(int argc, const char * argv[]) {
-    freopen("deriv.in", "r", stdin);
-    freopen("deriv.out", "w", stdout);
+    //freopen("deriv.in", "r", stdin);
+    //freopen("deriv.out", "w", stdout);
     bool making_readable_enabled = 0;
     while (1) {
         getline(cin, s);
@@ -282,13 +172,10 @@ int main(int argc, const char * argv[]) {
                 s2.push_back(s[i]);
         }
         s = s2;
-        if (s == "enable") {making_readable_enabled = 1; continue;}
-        if (s == "disable") {making_readable_enabled = 0; continue;}
         string ans = dirivative_expr(0, (int)s.size() - 1);
-        if (making_readable_enabled) make_readable(ans);
         string ans2 = "";
         for (int i = 0; i < (int) ans.size(); ++i) {
-            if (ans[i] == '^') {
+            if (false && ans[i] == '^') {
                 ans2.push_back('*');
                 ans2.push_back('*');
                 continue;
@@ -299,6 +186,5 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-
 // (u^v)' = (e^(vln(u)))' = u^v * (vln(u))'
 // x^x' = x^x (xlnx)' = x^x * (lnx + x/x)
