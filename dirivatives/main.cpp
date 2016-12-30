@@ -175,7 +175,7 @@ int main(int argc, const char * argv[]) {
         string ans = dirivative_expr(0, (int)s.size() - 1);
         string ans2 = "";
         for (int i = 0; i < (int) ans.size(); ++i) {
-            if (false && ans[i] == '^') {
+            if (ans[i] == '^') {
                 ans2.push_back('*');
                 ans2.push_back('*');
                 continue;
