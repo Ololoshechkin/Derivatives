@@ -159,7 +159,6 @@ string dirivative_expr(int l, int r) {
 int main(int argc, const char * argv[]) {
     freopen("deriv.in", "r", stdin);
     freopen("deriv.out", "w", stdout);
-    bool making_readable_enabled = 0;
     while (getline(cin, s)) {
         string s2 = "";
         for (int i = 0; i < (int) s.size(); ++i) {
