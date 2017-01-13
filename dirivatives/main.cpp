@@ -160,8 +160,7 @@ int main(int argc, const char * argv[]) {
     freopen("deriv.in", "r", stdin);
     freopen("deriv.out", "w", stdout);
     bool making_readable_enabled = 0;
-    while (1) {
-        getline(cin, s);
+    while (getline(cin, s)) {
         string s2 = "";
         for (int i = 0; i < (int) s.size(); ++i) {
             if (s[i] == '*' && s[i + 1] == '*') {
@@ -183,6 +182,7 @@ int main(int argc, const char * argv[]) {
             ans2.push_back(ans[i]);
         }
         cout << ans2 << endl;
+        s = "";
     }
     return 0;
 }
